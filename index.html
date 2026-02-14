@@ -1,135 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Birthday Card</title>
     <style>
-        :root {
-            --card-width: 300px;
-            --card-height: 420px;
-        }
+      :root {
+        --card-width: 300px;
+        --card-height: 420px;
+      }
 
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #1a1a1a;
-            font-family: sans-serif;
-            overflow: hidden;
-            touch-action: none; /* スマホでのスクロール暴発防止 */
-        }
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #1a1a1a;
+        font-family: sans-serif;
+        overflow: hidden;
+        touch-action: none; /* スマホでのスクロール暴発防止 */
+      }
 
-        /* 1. 傾きを検知する外枠（ここを tilt させる） */
-        .tilt-container {
-            width: var(--card-width);
-            height: var(--card-height);
-            perspective: 1000px;
-        }
+      /* 1. 傾きを検知する外枠（ここを tilt させる） */
+      .tilt-container {
+        width: var(--card-width);
+        height: var(--card-height);
+        perspective: 1000px;
+      }
 
-        /* 2. 実際に回転する中身 */
-        .card-inner {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
+      /* 2. 実際に回転する中身 */
+      .card-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        cursor: pointer;
+      }
 
-        /* クリック時に180度回転 */
-        .card-inner.is-flipped {
-            transform: rotateY(180deg);
-        }
+      /* クリック時に180度回転 */
+      .card-inner.is-flipped {
+        transform: rotateY(180deg);
+      }
 
-        /* 表裏の共通設定 */
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
+      /* 表裏の共通設定 */
+      .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
 
-        /* 表面 */
-        .card-front {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-        }
+      /* 表面 */
+      .card-front {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+      }
 
-        /* 裏面 */
-        .card-back {
-            background: #ffffff;
-            color: #333;
-            transform: rotateY(180deg);
-            padding: 20px;
-            box-sizing: border-box;
-        }
+      /* 裏面 */
+      .card-back {
+        background: #ffffff;
+        color: #333;
+        transform: rotateY(180deg);
+        padding: 20px;
+        box-sizing: border-box;
+      }
 
-        .photo-placeholder {
-            width: 100%;
-            height: 180px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      .photo-placeholder {
+        width: 100%;
+        height: 180px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .hint {
-            position: absolute;
-            bottom: 50px;
-            color: white;
-            opacity: 0.6;
-            pointer-events: none;
-        }
+      .hint {
+        position: absolute;
+        bottom: 50px;
+        color: white;
+        opacity: 0.6;
+        pointer-events: none;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="tilt-container" id="tiltElement">
-        <div class="card-inner" id="cardInner">
-            <div class="card-face card-front">
-                <span style="font-size: 80px;">🎂</span>
-                <p style="font-weight: bold; letter-spacing: 2px;">TAP TO OPEN</p>
-            </div>
-            <div class="card-face card-back">
-                <div class="photo-placeholder">📷 Photo Here</div>
-                <h2 style="margin: 0;">Happy Birthday!</h2>
-                <p>誕生日おめでとう！<br>素敵な1年になりますように。</p>
-            </div>
+      <div class="card-inner" id="cardInner">
+        <div class="card-face card-front">
+          <span style="font-size: 80px">🎂</span>
+          <p style="font-weight: bold; letter-spacing: 2px">TAP TO OPEN</p>
         </div>
+        <div class="card-face card-back">
+          <div class="photo-placeholder">📷 Photo Here</div>
+          <h2 style="margin: 0">Happy Birthday!</h2>
+          <p>誕生日おめでとう！<br />素敵な1年になりますように。</p>
+        </div>
+      </div>
     </div>
 
     <div class="hint">カードをタップしてね</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
     <script>
-        const cardInner = document.getElementById('cardInner');
-        const tiltElement = document.getElementById('tiltElement');
+      const cardInner = document.getElementById("cardInner");
+      const tiltElement = document.getElementById("tiltElement");
 
-        // クリック/タップで回転を切り替え
-        cardInner.addEventListener('click', (e) => {
-            cardInner.classList.toggle('is-flipped');
-        });
+      // クリック/タップで回転を切り替え
+      cardInner.addEventListener("click", (e) => {
+        cardInner.classList.toggle("is-flipped");
+      });
 
-        // 傾き演出の初期化
-        VanillaTilt.init(tiltElement, {
-            max: 20,
-            speed: 400,
-            glare: true,
-            "max-glare": 0.4,
-            gyroscope: true, // スマホのジャイロ（傾き）対応
-        });
+      // 傾き演出の初期化（スワイプ/マウス対応版）
+      VanillaTilt.init(tiltElement, {
+        max: 20, // 傾く最大角度
+        speed: 400, // 戻る速さ
+        glare: true, // 光沢演出
+        "max-glare": 0.4, // 光沢の強さ
+        gyroscope: false, // ジャイロは無効にする（スワイプ優先）
+        mouseEventsEnabled: true, // マウス操作を有効
+        touchEventsEnabled: true, // ★これを追加：タッチ操作で傾くようになります
+      });
     </script>
-</body>
+  </body>
 </html>
