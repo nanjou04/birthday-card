@@ -243,6 +243,8 @@
         sePlayer.play().catch((err) => console.log("SE再生エラー:", err));
 
         setTimeout(() => {
+          redirectBtn.innerText = "FOR YOU";
+          redirectBtn.classList.remove("loading");
           window.location.href = "https://www.youtube.com/";
         }, 4000);
       });
