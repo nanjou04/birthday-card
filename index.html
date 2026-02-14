@@ -15,7 +15,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
+        max-height: 100vh;
+        height: 100svh;
+        padding-bottom: 20px;
         background-color: #1a1a1a;
         font-family: sans-serif;
         overflow: hidden;
@@ -56,7 +58,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 4px solid rgba(255, 255, 255, 0.2);
       }
 
       /* 表面 */
@@ -67,22 +69,27 @@
 
       /* 裏面 */
       .card-back {
-        background: #ffffff;
+        background: #fff7e6;
+        border: 4px solid #fbe16e;
         color: #333;
         transform: rotateY(180deg);
-        padding: 20px;
+        padding: 20px 20px 28px;
         box-sizing: border-box;
       }
 
       .photo-placeholder {
         width: 100%;
-        height: 180px;
-        background: #f0f0f0;
-        border-radius: 10px;
-        margin-bottom: 15px;
+        height: auto;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .shiba-illustration {
+        width: 200px;
+        height: auto;
+        aspect-ratio: 1 / 1;
       }
 
       .hint {
@@ -102,24 +109,30 @@
           <p style="font-weight: bold; letter-spacing: 2px">TAP TO OPEN</p>
         </div>
         <div class="card-face card-back">
-          <div class="photo-placeholder">📷 Photo Here</div>
-          <h2 style="margin: 0">Happy Birthday!</h2>
-          <p>誕生日おめでとうございます！<br />素敵な1年になりますように。</p>
+          <div class="photo-placeholder">
+            <img src="shiba_front.png" alt="" class="shiba-illustration" />
+          </div>
+          <h4 style="margin: 0">誕生日おめでとうございます！</h4>
+          <p style="margin: 0">素敵な1年になりますように。</p>
+          <p style="font-size: 14px">
+            いつもあたたかい言葉をいただいており感謝の気持ちでいっぱいです！
+          </p>
+          <a href="https://www.youtube.com/" target="_blank">FOR YOU</a>
         </div>
       </div>
     </div>
 
     <div class="hint">カードをタップしてね</div>
-  
-　<script>
-    const cardInner = document.getElementById('cardInner');
-    const tiltElement = document.getElementById('tiltElement');
 
-    let startX, startY; // タップ開始位置を記録用
+    <script>
+      const cardInner = document.getElementById("cardInner");
+      const tiltElement = document.getElementById("tiltElement");
 
-    // --- 傾きとタップのハイブリッド処理 ---
+      let startX, startY; // タップ開始位置を記録用
 
-    const handleMove = (e) => {
+      // --- 傾きとタップのハイブリッド処理 ---
+
+      const handleMove = (e) => {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -133,55 +146,65 @@
         const rotateY = ((x - centerX) / centerX) * 20;
 
         tiltElement.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    };
+      };
 
-    // タッチ開始
-    tiltElement.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-    }, { passive: true });
+      // タッチ開始
+      tiltElement.addEventListener(
+        "touchstart",
+        (e) => {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        },
+        { passive: true },
+      );
 
-    // タッチ中（傾ける）
-    tiltElement.addEventListener('touchmove', (e) => {
-        // 指が少しでも動いたら、画面スクロールを止めて「傾き」に専念させる
-        if (Math.abs(e.touches[0].clientX - startX) > 5 || Math.abs(e.touches[0].clientY - startY) > 5) {
+      // タッチ中（傾ける）
+      tiltElement.addEventListener(
+        "touchmove",
+        (e) => {
+          // 指が少しでも動いたら、画面スクロールを止めて「傾き」に専念させる
+          if (
+            Math.abs(e.touches[0].clientX - startX) > 5 ||
+            Math.abs(e.touches[0].clientY - startY) > 5
+          ) {
             if (e.cancelable) e.preventDefault();
             handleMove(e);
-        }
-    }, { passive: false });
+          }
+        },
+        { passive: false },
+      );
 
-    // タッチ終了
-    tiltElement.addEventListener('touchend', (e) => {
+      // タッチ終了
+      tiltElement.addEventListener("touchend", (e) => {
         const endX = e.changedTouches[0].clientX;
         const endY = e.changedTouches[0].clientY;
 
         // 指の移動距離が小さければ「タップ」と判定してめくる
         if (Math.abs(endX - startX) < 10 && Math.abs(endY - startY) < 10) {
-            cardInner.classList.toggle('is-flipped');
+          cardInner.classList.toggle("is-flipped");
         }
 
         // 傾きをゆっくり戻す
         tiltElement.style.transition = "transform 0.5s ease";
         tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-        
-        // 次の動作のためにtransitionを消しておく
-        setTimeout(() => { tiltElement.style.transition = ""; }, 500);
-    });
 
-    // PCマウス用（念のため残しておく）
-    tiltElement.addEventListener('mousemove', handleMove);
-    tiltElement.addEventListener('mouseleave', () => {
+        // 次の動作のためにtransitionを消しておく
+        setTimeout(() => {
+          tiltElement.style.transition = "";
+        }, 500);
+      });
+
+      // PCマウス用（念のため残しておく）
+      tiltElement.addEventListener("mousemove", handleMove);
+      tiltElement.addEventListener("mouseleave", () => {
         tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-    });
-    tiltElement.addEventListener('click', () => {
+      });
+      tiltElement.addEventListener("click", () => {
         // PCではクリックでめくる
-        if (!('ontouchstart' in window)) {
-            cardInner.classList.toggle('is-flipped');
+        if (!("ontouchstart" in window)) {
+          cardInner.classList.toggle("is-flipped");
         }
-    });
-</script>
+      });
+    </script>
   </body>
 </html>
-
-
-
