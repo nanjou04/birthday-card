@@ -92,6 +92,31 @@
         aspect-ratio: 1 / 1;
       }
 
+      .cute-button {
+        margin-top: 15px;
+        padding: 12px 24px;
+        font-family: "M PLUS Rounded 1c", sans-serif;
+        font-size: 1rem;
+        font-weight: bold;
+        color: white;
+        background-color: #e67e22;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #a35d1a;
+        transition: all 0.2s;
+      }
+      .cute-button:active {
+        transform: translateY(4px); /* 押した時に沈む */
+        box-shadow: none;
+      }
+      /* ボタンが押された後の「待機中」の演出 */
+      .cute-button.loading {
+        background-color: #ccc;
+        box-shadow: none;
+        pointer-events: none; /* 連打防止 */
+      }
+
       .hint {
         position: absolute;
         bottom: 20px;
@@ -117,7 +142,10 @@
           <p style="font-size: 14px">
             いつもあたたかい言葉をいただいており感謝の気持ちでいっぱいです！
           </p>
-          <a href="https://www.youtube.com/" target="_blank">FOR YOU</a>
+          <div class="message-box">
+            <button id="redirectBtn" class="cute-button">FOR YOU</button>
+          </div>
+          <audio id="sePlayer" src="surprise_se.mp3"></audio>
         </div>
       </div>
     </div>
@@ -127,19 +155,26 @@
     <script>
       const cardInner = document.getElementById("cardInner");
       const tiltElement = document.getElementById("tiltElement");
+      const redirectBtn = document.getElementById("redirectBtn");
 
-      let startX, startY; // タップ開始位置を記録用
+      let startX, startY;
 
-      // --- 傾きとタップのハイブリッド処理 ---
+      // --- 【共通】めくる処理を実行する関数 ---
+      function toggleFlip(e) {
+        // もしクリック/タッチされたのがボタン（またはボタンの中身）なら、何もしない
+        if (e.target.closest("#redirectBtn")) {
+          return;
+        }
+        cardInner.classList.toggle("is-flipped");
+      }
 
+      // --- 1. 傾きとスワイプ判定 ---
       const handleMove = (e) => {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
         const rect = tiltElement.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
         const rotateX = ((y - centerY) / centerY) * -20;
@@ -148,7 +183,6 @@
         tiltElement.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
       };
 
-      // タッチ開始
       tiltElement.addEventListener(
         "touchstart",
         (e) => {
@@ -158,11 +192,9 @@
         { passive: true },
       );
 
-      // タッチ中（傾ける）
       tiltElement.addEventListener(
         "touchmove",
         (e) => {
-          // 指が少しでも動いたら、画面スクロールを止めて「傾き」に専念させる
           if (
             Math.abs(e.touches[0].clientX - startX) > 5 ||
             Math.abs(e.touches[0].clientY - startY) > 5
@@ -174,36 +206,50 @@
         { passive: false },
       );
 
-      // タッチ終了
+      // --- 2. タッチ終了時の「めくる」判定 ---
       tiltElement.addEventListener("touchend", (e) => {
         const endX = e.changedTouches[0].clientX;
         const endY = e.changedTouches[0].clientY;
 
-        // 指の移動距離が小さければ「タップ」と判定してめくる
+        // 移動距離が短く、かつボタン以外ならめくる
         if (Math.abs(endX - startX) < 10 && Math.abs(endY - startY) < 10) {
-          cardInner.classList.toggle("is-flipped");
+          toggleFlip(e);
         }
 
-        // 傾きをゆっくり戻す
+        // 傾きをリセット
         tiltElement.style.transition = "transform 0.5s ease";
         tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-
-        // 次の動作のためにtransitionを消しておく
         setTimeout(() => {
           tiltElement.style.transition = "";
         }, 500);
       });
 
-      // PCマウス用
-      tiltElement.addEventListener("mousemove", handleMove);
-      tiltElement.addEventListener("mouseleave", () => {
-        tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-      });
-      tiltElement.addEventListener("click", () => {
-        // PCではクリックでめくる
+      // --- 3. PC用のクリック判定 ---
+      // スマホではtouchendが優先されるため、PCでのみ動くように制御
+      tiltElement.addEventListener("click", (e) => {
         if (!("ontouchstart" in window)) {
-          cardInner.classList.toggle("is-flipped");
+          toggleFlip(e);
         }
+      });
+
+      // --- 4. 遷移ボタン専用の処理 ---
+      redirectBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // 親要素（カード）へのイベント伝播を阻止
+
+        redirectBtn.innerText = "再生中... 🎶";
+        redirectBtn.classList.add("loading");
+
+        const sePlayer = document.getElementById("sePlayer");
+        sePlayer.play().catch((err) => console.log("SE再生エラー:", err));
+
+        setTimeout(() => {
+          window.location.href = "https://www.youtube.com/";
+        }, 4000);
+      });
+
+      // マウス移動用（PC）
+      tiltElement.addEventListener("mousemove", (e) => {
+        if (!("ontouchstart" in window)) handleMove(e);
       });
     </script>
   </body>
