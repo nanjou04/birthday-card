@@ -110,27 +110,33 @@
     </div>
 
     <div class="hint">カードをタップしてね</div>
-
+  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
     <script>
-      const cardInner = document.getElementById("cardInner");
-      const tiltElement = document.getElementById("tiltElement");
+        const cardInner = document.getElementById('cardInner');
+        const tiltElement = document.getElementById('tiltElement');
 
-      // クリック/タップで回転を切り替え
-      cardInner.addEventListener("click", (e) => {
-        cardInner.classList.toggle("is-flipped");
-      });
+        // 1. タップで裏返す（クリックとタッチ両対応）
+        cardInner.addEventListener('click', (e) => {
+            cardInner.classList.toggle('is-flipped');
+        });
 
-      // 傾き演出の初期化（スワイプ/マウス対応版）
-      VanillaTilt.init(tiltElement, {
-        max: 20, // 傾く最大角度
-        speed: 400, // 戻る速さ
-        glare: true, // 光沢演出
-        "max-glare": 0.4, // 光沢の強さ
-        gyroscope: false, // ジャイロは無効にする（スワイプ優先）
-        mouseEventsEnabled: true, // マウス操作を有効
-        touchEventsEnabled: true, // タッチ操作で傾くように
-      });
+        // 2. 傾き演出の初期化（スマホのスワイプに特化）
+        VanillaTilt.init(tiltElement, {
+            max: 25,             // 傾きを少し大きくして分かりやすく
+            speed: 800,          // 戻る時の滑らかさ
+            glare: true,         // 光沢あり
+            "max-glare": 0.5,
+            gyroscope: false,    // ジャイロはオフ
+            mouseEventsEnabled: true,
+            touchEventsEnabled: true, // 指での操作を有効化
+        });
+
+        // 3. 【重要】スマホで指を動かした時に画面が動かないようにするおまじない
+        tiltElement.addEventListener("touchmove", function (e) {
+            e.preventDefault();
+        }, { passive: false });
     </script>
   </body>
 </html>
+
