@@ -18,10 +18,10 @@
         max-height: 100vh;
         height: 100svh;
         padding-bottom: 20px;
-        background: url("bg.jpg");
+        background: url("bg.jpg") repeat;
         font-family: sans-serif;
         overflow: hidden;
-        touch-action: none; /* スマホでのスクロール暴発防止 */
+        touch-action: none;
       }
 
       /* 1. 傾きを検知する外枠（ここを tilt させる） */
@@ -194,7 +194,7 @@
         }, 500);
       });
 
-      // PCマウス用（念のため残しておく）
+      // PCマウス用
       tiltElement.addEventListener("mousemove", handleMove);
       tiltElement.addEventListener("mouseleave", () => {
         tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
