@@ -87,7 +87,7 @@
 
       .hint {
         position: absolute;
-        bottom: 50px;
+        bottom: 20px;
         color: white;
         opacity: 0.6;
         pointer-events: none;
@@ -111,32 +111,57 @@
 
     <div class="hint">カードをタップしてね</div>
   
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
-    <script>
-        const cardInner = document.getElementById('cardInner');
-        const tiltElement = document.getElementById('tiltElement');
+<script>
+    const cardInner = document.getElementById('cardInner');
+    const tiltElement = document.getElementById('tiltElement');
 
-        // 1. タップで裏返す（クリックとタッチ両対応）
-        cardInner.addEventListener('click', (e) => {
-            cardInner.classList.toggle('is-flipped');
-        });
+    // --- 1. タップで裏返す処理 ---
+    cardInner.addEventListener('click', () => {
+        cardInner.classList.toggle('is-flipped');
+    });
 
-        // 2. 傾き演出の初期化（スマホのスワイプに特化）
-        VanillaTilt.init(tiltElement, {
-            max: 25,             // 傾きを少し大きくして分かりやすく
-            speed: 800,          // 戻る時の滑らかさ
-            glare: true,         // 光沢あり
-            "max-glare": 0.5,
-            gyroscope: false,    // ジャイロはオフ
-            mouseEventsEnabled: true,
-            touchEventsEnabled: true, // 指での操作を有効化
-        });
+    // --- 2. スマホのスワイプで傾ける処理 ---
+    const handleMove = (e) => {
+        // 指の位置、またはマウスの位置を取得
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        // 3. 【重要】スマホで指を動かした時に画面が動かないようにするおまじない
-        tiltElement.addEventListener("touchmove", function (e) {
-            e.preventDefault();
-        }, { passive: false });
-    </script>
+        const rect = tiltElement.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        // 中心からの距離を計算 (-1 ~ 1 の範囲)
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -20; // 最大20度
+        const rotateY = ((x - centerX) / centerX) * 20;
+
+        // 傾きを適用
+        tiltElement.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    };
+
+    // 指が触れている間だけ計算
+    tiltElement.addEventListener('touchstart', (e) => {
+        if (e.cancelable) e.preventDefault(); // スクロール禁止
+    }, { passive: false });
+
+    tiltElement.addEventListener('touchmove', (e) => {
+        if (e.cancelable) e.preventDefault();
+        handleMove(e);
+    }, { passive: false });
+
+    // 指を離したらリセット
+    tiltElement.addEventListener('touchend', () => {
+        tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    });
+
+    // PCマウス用（確認用）
+    tiltElement.addEventListener('mousemove', handleMove);
+    tiltElement.addEventListener('mouseleave', () => {
+        tiltElement.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    });
+</script>
   </body>
 </html>
+
 
